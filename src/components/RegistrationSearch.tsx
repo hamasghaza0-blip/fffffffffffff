@@ -67,10 +67,10 @@ export const RegistrationSearch: React.FC<RegistrationSearchProps> = ({ isDarkMo
 
     setSearchError('');
     setIsLoading(true);
-    setSearchAttempted(true);
+    setSearchAttempted(false); // تأخير إظهار النتيجة حتى انتهاء البحث
     
-    // إضافة تأخير قصير لتجنب مشكلة العرض السريع
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // إضافة تأخير أطول لضمان عدم إظهار النتيجة قبل انتهاء البحث
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
       const { data, error } = await supabase
@@ -92,6 +92,7 @@ export const RegistrationSearch: React.FC<RegistrationSearchProps> = ({ isDarkMo
       setSearchError('حدث خطأ أثناء البحث');
     } finally {
       setIsLoading(false);
+      setSearchAttempted(true); // إظهار النتيجة فقط بعد انتهاء البحث
     }
   };
 
@@ -103,50 +104,58 @@ export const RegistrationSearch: React.FC<RegistrationSearchProps> = ({ isDarkMo
 
   // دالة للحصول على موعد الاختبار حسب الفئة
   const getExamScheduleForCategory = (category: string) => {
-    const schedules: { [key: string]: { day: string; time: string; date: string } } = {
+    const schedules: { [key: string]: { day: string; time: string; date: string; hijriDate: string } } = {
       "ثلاثة أجزاء": { 
         day: "الجمعة", 
         time: "٢:٠٠ ظهراً", 
-        date: "الجمعة، ٨ أغسطس ٢٠٢٥ م" 
+        date: "الجمعة، ٨ أغسطس ٢٠٢٥ م",
+        hijriDate: "الجمعة، ٦ صفر ١٤٤٧ هـ"
       },
       "خمسة أجزاء": { 
         day: "السبت", 
-        time: "١٢:٠٠ ظهراً", 
-        date: "السبت، ٩ أغسطس ٢٠٢٥ م" 
+        time: "١:٣٠ ظهراً", 
+        date: "السبت، ٩ أغسطس ٢٠٢٥ م",
+        hijriDate: "السبت، ٧ صفر ١٤٤٧ هـ"
       },
       "ثمانية أجزاء": { 
         day: "السبت", 
-        time: "١٢:٠٠ ظهراً", 
-        date: "السبت، ٩ أغسطس ٢٠٢٥ م" 
+        time: "١:٣٠ ظهراً", 
+        date: "السبت، ٩ أغسطس ٢٠٢٥ م",
+        hijriDate: "السبت، ٧ صفر ١٤٤٧ هـ"
       },
       "عشرة أجزاء": { 
         day: "الجمعة", 
         time: "٢:٠٠ ظهراً", 
-        date: "الجمعة، ١٥ أغسطس ٢٠٢٥ م" 
+        date: "الجمعة، ١٥ أغسطس ٢٠٢٥ م",
+        hijriDate: "الجمعة، ١٣ صفر ١٤٤٧ هـ"
       },
       "خمسة عشر جزءا": { 
         day: "الجمعة", 
         time: "٢:٠٠ ظهراً", 
-        date: "الجمعة، ١٥ أغسطس ٢٠٢٥ م" 
+        date: "الجمعة، ١٥ أغسطس ٢٠٢٥ م",
+        hijriDate: "الجمعة، ١٣ صفر ١٤٤٧ هـ"
       },
       "عشرون جزءا": { 
         day: "الجمعة", 
         time: "٢:٠٠ ظهراً", 
-        date: "الجمعة، ١٥ أغسطس ٢٠٢٥ م" 
+        date: "الجمعة، ١٥ أغسطس ٢٠٢٥ م",
+        hijriDate: "الجمعة، ١٣ صفر ١٤٤٧ هـ"
       },
       "خمسة وعشرون جزءا": { 
         day: "السبت", 
-        time: "١٢:٠٠ ظهراً", 
-        date: "السبت، ١٦ أغسطس ٢٠٢٥ م" 
+        time: "١:٣٠ ظهراً", 
+        date: "السبت، ١٦ أغسطس ٢٠٢٥ م",
+        hijriDate: "السبت، ١٤ صفر ١٤٤٧ هـ"
       },
       "ثلاثون جزءا": { 
         day: "السبت", 
-        time: "١٢:٠٠ ظهراً", 
-        date: "السبت، ١٦ أغسطس ٢٠٢٥ م" 
+        time: "١:٣٠ ظهراً", 
+        date: "السبت، ١٦ أغسطس ٢٠٢٥ م",
+        hijriDate: "السبت، ١٤ صفر ١٤٤٧ هـ"
       }
     };
     
-    return schedules[category] || { day: "غير محدد", time: "غير محدد", date: "غير محدد" };
+    return schedules[category] || { day: "غير محدد", time: "غير محدد", date: "غير محدد", hijriDate: "غير محدد" };
   };
 
   const formatDate = (dateString: string) => {
@@ -347,6 +356,9 @@ export const RegistrationSearch: React.FC<RegistrationSearchProps> = ({ isDarkMo
                                 {schedule.day} - {schedule.time}
                               </p>
                               <p className={`text-lg ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
+                                {schedule.hijriDate}
+                              </p>
+                              <p className={`text-lg ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
                                 {schedule.date}
                               </p>
                               <p className={`text-sm ${isDarkMode ? 'text-yellow-500' : 'text-yellow-500'}`}>
@@ -355,6 +367,42 @@ export const RegistrationSearch: React.FC<RegistrationSearchProps> = ({ isDarkMo
                             </div>
                           );
                         })()}
+                      </div>
+                      
+                      {/* تعليمات الاختبار */}
+                      <div className={`text-center p-6 rounded-2xl border-2 mb-4 transition-colors duration-300 ${
+                        isDarkMode 
+                          ? 'bg-gradient-to-r from-green-900/30 to-emerald-900/30 border-green-600/50' 
+                          : 'bg-gradient-to-r from-green-100 to-emerald-100 border-green-300'
+                      }`}>
+                        <div className="flex justify-center items-center gap-3 mb-4">
+                          <GraduationCap className={`w-8 h-8 ${isDarkMode ? 'text-green-400' : 'text-green-600'} animate-bounce-slow`} />
+                          <h4 className={`text-2xl font-bold ${isDarkMode ? 'text-green-200' : 'text-green-800'}`}>
+                            تعليمات الاختبار
+                          </h4>
+                        </div>
+                        <div className="space-y-3 text-right">
+                          <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/70'}`}>
+                            <p className={`text-lg font-semibold ${isDarkMode ? 'text-green-300' : 'text-green-700'}`}>
+                              ✅ احضر قبل الموعد بـ 15 دقيقة على الأقل
+                            </p>
+                          </div>
+                          <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/70'}`}>
+                            <p className={`text-lg font-semibold ${isDarkMode ? 'text-green-300' : 'text-green-700'}`}>
+                              📖 أحضر المصحف الشريف معك
+                            </p>
+                          </div>
+                          <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/70'}`}>
+                            <p className={`text-lg font-semibold ${isDarkMode ? 'text-green-300' : 'text-green-700'}`}>
+                              🤲 ادع الله أن يوفقك في الاختبار
+                            </p>
+                          </div>
+                          <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-gray-800/50' : 'bg-white/70'}`}>
+                            <p className={`text-lg font-semibold ${isDarkMode ? 'text-green-300' : 'text-green-700'}`}>
+                              📱 في حالة وجود استفسار، تواصل مع إدارة المسابقة
+                            </p>
+                          </div>
+                        </div>
                       </div>
                       
                       <div className={`text-center p-6 rounded-2xl border-2 transition-colors duration-300 ${
