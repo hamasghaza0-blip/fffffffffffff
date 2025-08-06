@@ -21,18 +21,31 @@ export const RegistrationSearch: React.FC<RegistrationSearchProps> = ({ isDarkMo
 
   const fetchTotalStudents = async () => {
     try {
+      console.log('Attempting to fetch total students...');
       const { count, error } = await supabase
         .from('reciters')
         .select('*', { count: 'exact', head: true });
 
       if (error) {
-        console.error('Error fetching total students:', error);
+        console.error('Supabase error fetching total students:', error);
+        console.error('Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
         return;
       }
 
+      console.log('Successfully fetched student count:', count);
       setTotalStudents(count || 0);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Network/Connection error:', error);
+      console.error('This usually means:');
+      console.error('1. Supabase URL is incorrect or missing');
+      console.error('2. Supabase anon key is incorrect or missing');
+      console.error('3. Network connectivity issues');
+      console.error('4. Supabase project is not accessible');
     }
   };
 
